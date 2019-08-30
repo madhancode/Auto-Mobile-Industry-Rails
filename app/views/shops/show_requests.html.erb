@@ -1,0 +1,53 @@
+<h2>Requests</h2>
+
+<% if @requests == [] %>
+    <small>No Requests Yet</small>    
+<% else %>
+    
+    <% @requests.each do |request| %>
+        <div class="m-4">
+
+            <div class="card bg-light m-4">
+                <div class="card-body">
+
+                    <% shop = Shop.find(request.buyer_id)
+                        product = request.product
+                        user = shop.users.find_by(position: "CEO") %>
+                    
+                    <h5><%= user.name %> (<%= shop.name %>)</h5>                    
+                    <small class="mr-4"><strong>Requested : </strong><%= pluralize(request.req_quantity, product.name) %></small>
+                    
+                    <% if request.status == "Not Processed" %>
+                        <small class="ml-4"><strong>Available : </strong><%= product.quantity %></small>
+                        <br /><br />
+                        <div class="d-flex justify-content-between">
+
+                            <div class="d-inline">
+                                <%= form_for([ shop, product, Request.find(request.id) ]) do |f| %>
+                                    <%= f.text_field :given_quantity, autocomplete: "off" %>
+                                    <%= f.submit 'Send', class: "btn btn-secondary btn-sm" %>
+                                <% end %>
+                            </div>
+                            <div>
+                                <%= form_for ([ shop, product, Request.find(request.id) ]) do |f| %>
+                                    <%= f.hidden_field :given_quantity, value: 0 %>
+                                    <%= f.submit 'Decline', class: "btn btn-danger btn-sm" %>
+                                <% end %>
+                            </div>
+                        </div>
+
+                    <% else %>
+                        <br /><br />
+                        <% if request.given_quantity != 0%>
+                            <small class="muted text-success"><strong>Sent : </strong> <%= pluralize(request.given_quantity, product.name) %></small>
+                        <% else %>
+                            <small class="muted text-danger"><strong>Declined</strong></small>
+                        <% end %>
+
+                    <% end %>
+                </div>
+            </div>          
+        </div>
+    <% end %>
+
+<% end %>

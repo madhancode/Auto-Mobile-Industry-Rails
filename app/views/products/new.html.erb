@@ -1,0 +1,25 @@
+
+<%= form_for([ @shop, @product ]) do |form| %>
+<h5>New Product:</h5>
+
+<% if @product.errors.any? %>
+    <!-- <% @product.errors.full_messages.each do |msg| %>
+        <div class="alert alert-danger"><%= msg %></div>
+    <% end %> -->
+    <div class="alert alert-danger"><%= @product.errors.full_messages.first %></div>
+<% end %>
+
+<table>
+    <tbody>
+        <tr>
+            <td><%= form.label :name %></td>
+            <td><%= form.text_field :name, autofocus:true, class:"form-control" %></td>
+        </tr>
+        <tr>
+            <td><%= form.label :quantity %></td>
+            <td><%= form.text_field :quantity, class:"form-control" %></td>
+        </tr>
+    </tbody>
+</table><br />
+<%= form.submit "Create Product", class:"btn btn-primary btn-sm" %>
+<% end %>

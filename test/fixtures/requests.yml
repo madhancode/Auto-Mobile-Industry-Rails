@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  req_quantity: 1
+  given: 
+  status: MyString
+
+two:
+  product: two
+  req_quantity: 1
+  given: 
+  status: MyString

@@ -1,0 +1,21 @@
+wb = xlsx_package.workbook
+    
+wb.styles do |style|
+    company_heading = style.add_style(b: true, sz: 14)
+    heading = style.add_style(b: true)
+
+    wb.add_worksheet(name: "Products") do |sheet|
+
+        sheet.add_row [@shop.name], style: company_heading
+        # Add the date this was downloaded
+        sheet.add_row ["Downloaded at", Time.now.strftime("%b %-d, %Y")]
+        sheet.add_row []
+        
+        # Create the header row
+        sheet.add_row ["Product Name", "Quantity"], style: heading
+        # Create entries for each item
+        @shop.products.each do |product|
+            sheet.add_row [product.name, product.quantity]
+        end
+    end
+end

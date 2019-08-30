@@ -1,0 +1,111 @@
+<h2><%= @shop.name %></h2>
+<p><strong>Address : </strong><%= @shop.address %></p>
+<p><strong>CEO : </strong><%= @shop.users.find_by(position: "CEO").name %></p>
+<%= link_to "Back", shops_path %>
+<div class="m-4">
+    <h4>Products</h4>
+
+    <table class="table table-sm table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Quantity</th>
+                <% if current_user.shop != @shop%>
+                    <th colspan="2"></th>                
+                <% end %>
+            </tr>
+        </thead>
+
+        <tbody>
+            <div id="products">
+                <% @shop.products.each do |product| %>
+                    <tr>
+                        <td><%= product.name %></td>
+                        <td><%= product.quantity %></td>
+                        <% if current_user.shop != @shop%>
+                            <%= form_for([ @shop, product, Request.new ]) do |f| %>
+                                <td><%= f.text_field :req_quantity, autocomplete: "off" %></td>
+
+                                <% if product.requests.find_by(buyer_id: current_user.shop.id, status: "Not Processed") %>
+                                    <% req = product.requests.find_by(buyer_id: current_user.shop.id, status: "Not Processed") %>
+                                    <td><%= req.req_quantity.to_s + " Requested" %></td>
+                                <% else %>
+                                    <td><%= f.submit 'Request', class:"btn btn-primary btn-sm" %></td>
+                                <% end %>
+
+                            <% end %>
+                        <% end %>
+                    </tr>
+                <% end %>
+            </div>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-around">
+        <div>
+            <%=link_to shop_path(format: :xlsx) do %>
+                <i class="material-icons md-dark">get_app</i>
+                <strong>Download Products as Excel</strong>
+            <% end %>
+        </div>
+        <div>
+            <%= link_to shop_path(format: :pdf) do%>
+                <i class="material-icons md-dark">picture_as_pdf</i>
+                <strong>Generate PDF</strong>
+            <% end %><br /><br />
+        </div>
+    
+    </div>
+
+
+    <% if current_user.shop.id == @shop.id && current_user.position == 'CEO'%>
+        <%= link_to "Add New Product", new_shop_product_path(@shop) %><br /><br />
+
+        <h4>Request Status</h4>
+        <div class="m-4">
+
+            <table class="table table-dark table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>To</th>
+                        <th>Requests</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Processed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% Request.where(buyer_id: current_user.shop.id).order("updated_at DESC").each do |request| %>
+                    
+                        <% shop = Shop.find(request.buyer_id)
+                        product = request.product
+                        user = shop.users.find_by(position: "CEO") %>
+                        <% if request.status == "Not Processed" %>
+                            <% color = "warning" %>
+                        <% elsif request.status == "Declined" %>
+                            <% color = "danger" %>
+                        <% else %>
+                            <% color = "success" %>
+                        <% end %>
+
+                        <tr>
+                            <td><%= Shop.find_by(id: request.supplier_id).name %></td>
+                            <td><%= pluralize(request.req_quantity, request.product.name) %></td>
+                            <td class=<%= "text-"+color %> ><%= request.status %></td>
+                            <td><%= request.created_at.strftime('%b %-d, %Y (%I:%M %p)') %></td>
+                            <td>
+                                <% if request.created_at != request.updated_at %>
+                                    <%= request.updated_at.strftime('%b %-d, %Y (%I:%M %p)') %>
+                                <% else %>
+                                     ----------------------------------------
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+
+        </div>
+    <% end %>
+    <br /><br />
+</div>
