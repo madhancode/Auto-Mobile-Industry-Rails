@@ -14,9 +14,14 @@
     </div>
 
     <div class="field">
+        <%= f.label :shop_id %><br />
+        <%= f.select :shop_id, Shop.all.collect {|s| [ s.name, s.id ] }, { :include_blank => "Choose..." }, class:"form-control" %>
+    </div>
+
+    <div class="field">
         <%= f.label :position %><br />
-        <%= f.select :position, ['HR', 'Manager', 'Engineer', 'Intern'], {:include_blank => "Choose..."}, class:"form-control" %>
-      </div>
+        <%= f.select :position, [ 'CEO', 'HR', 'Manager', 'Engineer', 'Intern' ], {:include_blank => "Choose..."}, class:"form-control" %>
+    </div>
 
     <div class="field">
       <%= f.label :password %>
